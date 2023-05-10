@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Bike Racing Game</title>
+    <style>
+      canvas {
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="myCanvas" width="480" height="320"></canvas>
+
+    <script>
+      // get canvas element and context
+      const canvas = document.getElementById("myCanvas");
+      const ctx = canvas.getContext("2d");
+
+      // define bike properties
+      let bikeWidth = 50;
+      let bikeHeight = 80;
+      let bikeX = (canvas.width - bikeWidth) / 2;
+      let bikeY = canvas.height - bikeHeight;
+      let bikeSpeed = 5;
+
+      // define obstacle properties
+      let obstacleWidth = 50;
+      let obstacleHeight = 50;
+      let obstacleX = Math.random() * (canvas.width - obstacleWidth);
+      let obstacleY = 0;
+      let obstacleSpeed = 3;
+
+      // define score variable
+      let score = 0;
+
+      // add event listeners for arrow keys
+      document.addEventListener("keydown", keyDownHandler, false);
+      document.addEventListener("keyup", keyUpHandler, false);
+
+      function keyDownHandler(e) {
+        if (e.keyCode == 39) {
+          bikeX += bikeSpeed;
+        } else if (e.keyCode == 37) {
+          bikeX -= bikeSpeed;
+        }
+      }
+
+      function keyUpHandler(e) {
+        if (e.keyCode == 39) {
+          bikeX -= bikeSpeed;
+        } else if (e.keyCode == 37) {
+          bikeX += bikeSpeed;
+        }
+      }
+
+      // define draw functions
+      function drawBike() {
+        ctx.beginPath();
+        ctx.rect(bikeX, bikeY, bikeWidth, bikeHeight);
+        ctx.fillStyle = "blue";
+        ctx.fill();
+        ctx.closePath();
+      }
+
+      function drawObstacle() {
+        ctx.beginPath();
+        ctx.rect(obstacleX, obstacleY, obstacleWidth, obstacleHeight);
+        ctx.fillStyle = "red";
+        ctx.fill();
+        ctx.closePath();
+      }
+
+      function drawScore() {
+        ctx.font = "16px Arial";
+        ctx.fillStyle = "black";
+        ctx.fillText("Score: " + score, 10, 20);
+      }
+
+      function draw() {
+        // clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // draw bike, obstacle, and score
+        drawBike();
+        drawObstacle();
+        drawScore();
+
+        // move obstacle down
+        obstacleY += obstacleSpeed;
+
+        // check for collision with bike
+        if (
+          obstacleY + obstacleHeight > bikeY &&
+          obstacleY < bikeY + bikeHeight &&
+          obstacleX + obstacleWidth > bikeX &&
+          obstacleX < bikeX + bikeWidth
+        ) {
+          // game over
+          alert("GAME OVER\nScore: " + score);
+          document.location.reload();
+          clearInterval(interval); // Needed for Chrome to end game
+        }
+
+        // check for obstacle off screen
+        if (obstacleY > canvas.height) {
+          // reset obstacle position
+          obstacleX = Math.random() * (canvas.width - obstacleWidth);
+          obstacleY = 0;
+
+          // increase score
+          score++;
+        }
+
+        // redraw canvas
+        requestAnimationFrame(draw);
+      }
+
+      // start game loop
+      let interval = setInterval(draw, 10);
+    </script>
+  </body>
+</html>
